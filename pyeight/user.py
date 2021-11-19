@@ -727,24 +727,27 @@ class EightUser(object):
         url = '{}/devices/{}'.format(API_URL, self.device.deviceid)
 
         # Catch bad low inputs
-        if self.device.is_pod:
-            level = -100 if level < -100 else level
-        else:
-            level = 0 if level < 0 else level
+        if level is not None:
+            if self.device.is_pod:
+                level = -100 if level < -100 else level
+            else:
+                level = 0 if level < 0 else level
 
-        # Catch bad high inputs
-        level = 100 if level > 100 else level
+            # Catch bad high inputs
+            level = 100 if level > 100 else level
 
         if self.side == 'left':
             data = {
-                'leftHeatingDuration': duration,
-                'leftTargetHeatingLevel': level
+                'leftHeatingDuration': duration
             }
+            if level is not None:
+                data['leftTargetHeatingLevel'] = level
         elif self.side == 'right':
             data = {
-                'rightHeatingDuration': duration,
-                'rightTargetHeatingLevel': level
+                'rightHeatingDuration': duration
             }
+            if level is not None:
+                data['rightTargetHeatingLevel'] = level
 
         set_heat = await self.device.api_put(url, data)
         if set_heat is None:
